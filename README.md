@@ -1,0 +1,1 @@
+# A1111_prompting_strategy_for_diffusers
