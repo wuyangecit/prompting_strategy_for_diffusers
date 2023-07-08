@@ -1,1 +1,2 @@
-# A1111_prompting_strategy_for_diffusers
+# prompting_strategy_for_diffusers
+How to use please see test.ipynb
