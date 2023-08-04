@@ -10,8 +10,6 @@ import time
 import gc
 import random
 import json
-from utils.log_config import get_logger
-log = get_logger('cn_process')
 
 
 class ControlNetProcess:
@@ -87,7 +85,6 @@ class ControlNetProcess:
                  num_inference_steps=25,
                  num_images_per_prompt: Optional[int] = 1,
                  guess_mode: bool = False,
-                 task_id=None
                  ):
         try:
             #---多重controlnet判断---#
@@ -172,7 +169,6 @@ class ControlNetProcess:
                                ).images
                 image_info = self.get_image_info_controlnet(isI2I,prompt, width, height, num_inference_steps, guidance_scale,
                                             num_images_per_prompt, seed, controlnet_res_info,
-                                            task_id=task_id,
                                             negative_prompt=negative_prompt,
                                             apply_lora_list=apply_lora_list)
             else:
@@ -193,7 +189,6 @@ class ControlNetProcess:
                 image_info = self.get_image_info_controlnet(isI2I, prompt, width, height, num_inference_steps,
                                                             guidance_scale,num_images_per_prompt,
                                                             seed, controlnet_res_info,
-                                                            task_id=task_id,
                                                             negative_prompt=negative_prompt,
                                                             apply_lora_list=apply_lora_list)
 
@@ -203,12 +198,11 @@ class ControlNetProcess:
             pipeline.controlnet = None
             self.unload_controlnet_model()
             end_unload_controlnet_time = time.time()
-            log.info(
+            print(
                 f'controlnet inner time consume: {round((end_unload_controlnet_time - start_time), 2)}|preprocess: {round((end_preprocess_time - start_time), 2)}|load_controlnet: {round((end_load_controlnet_time - end_preprocess_time), 2)}|generate_image: {round((end_generate_time - end_load_controlnet_time), 2)}|unload_controlnet: {round((end_unload_controlnet_time - end_generate_time), 2)}')
             return out,image_info
 
         except Exception as e:
-            log.error(f'controlnet inner error: {e}', exc_info=True)
             return None,None
 
     def unload_controlnet_model(self):
@@ -222,7 +216,7 @@ class ControlNetProcess:
                 torch.cuda.ipc_collect()
 
     def get_image_info_controlnet(self,isI2I, prompt, width, height, num_inference_steps, guidance_scale, num_images_per_prompt,
-                       seed, controlnet_res_info, denoise_strength=0.0, negative_prompt='', apply_lora_list=None, task_id=None):
+                       seed, controlnet_res_info, denoise_strength=0.0, negative_prompt='', apply_lora_list=None):
         image_info_res = []
         for i in range(num_images_per_prompt):
             info_dict = dict()
@@ -237,7 +231,5 @@ class ControlNetProcess:
             if isI2I:
                 info_dict['denoise_strength'] = denoise_strength if denoise_strength else 0
             info_dict['loras'] = apply_lora_list if apply_lora_list else []
-            if task_id is not None:
-                info_dict['task_id'] = task_id
             image_info_res.append(json.dumps(info_dict))
         return image_info_res
