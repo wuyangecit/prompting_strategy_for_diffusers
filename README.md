@@ -4,7 +4,7 @@
 ### feature
 * prompt supports a limit of more than 77 tokens
 * support texual_inversion
-* Support weight，比如(1girl:1.2),[1boy]
+* Support weight，such as(1girl:1.2),[1boy]
 * Similar to a1111 embedding
 
 ## 2. lora
